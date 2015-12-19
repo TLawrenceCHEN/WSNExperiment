@@ -33,3 +33,6 @@
 
 Multi-hops/build/*
 Multi-hops/src/*
+Multi-hops/.cache
+Multi-hops/.project
+Multi-hops/.targetsOptions
