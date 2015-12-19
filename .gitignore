@@ -30,3 +30,6 @@
 
 # Debug files
 *.dSYM/
+
+Multi-hops/build/*
+Multi-hops/src/*
