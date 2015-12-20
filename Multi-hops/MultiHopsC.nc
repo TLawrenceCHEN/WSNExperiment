@@ -17,12 +17,15 @@ module MultiHopsC {
 	uses interface Read<uint16_t> as ReadTemp;
 	uses interface Read<uint16_t> as ReadHumidity;
 } implementation {
-	uint16_t counter = 0, temp, humidity, humidityLinear, light;
+	uint16_t counter = 0, temp, humidity, humidityLinear, light, version = 0;
 	message_t pkt, retranspkt;
 	bool busy = FALSE, retransbusy = FALSE;
 	bool LightReadDone = FALSE, TempReadDone = FALSE, HumidityReadDone = FALSE;
+	uint16_t destinationAddr = 0; 
 	
 	event void Boot.booted() {
+		if (TOS_NODE_ID != 1)
+			destinationAddr = 1;
 		call AMControl.start();
 	}
 
@@ -105,8 +108,10 @@ module MultiHopsC {
 					mhpkt->humidity = humidity;
 					mhpkt->light = light;
 					mhpkt->curtime = call Timer0.getNow();
-					printf("time: %lu\n", call Timer0.getNow());
-					if (call AMSend.send(0, &pkt, sizeof(MultiHopsMsg)) == SUCCESS) {
+					mhpkt->interval = TIMER_PERIOD_MILLI;
+					mhpkt->version = version;
+					//printf("time: %lu\n", call Timer0.getNow());
+					if (call AMSend.send(destinationAddr, &pkt, sizeof(MultiHopsMsg)) == SUCCESS) {
 						busy = TRUE;
 					}
 				}
@@ -141,23 +146,27 @@ module MultiHopsC {
 					if (retransmhpkt == NULL) {
 						return;
 					}
+					retransmhpkt->token = mhpkt->token;
 					retransmhpkt->nodeid = mhpkt->nodeid;
 					retransmhpkt->seqnumber = mhpkt->seqnumber;
 					retransmhpkt->temperature = mhpkt->temperature;
 					retransmhpkt->humidity = mhpkt->humidity;
 					retransmhpkt->light = mhpkt->light;
 					retransmhpkt->curtime = mhpkt->curtime;
-					if (call AMResend.send(0, &retranspkt, sizeof(MultiHopsMsg)) == SUCCESS) {
+					retransmhpkt->interval = mhpkt->interval;
+					retransmhpkt->version = mhpkt->version;
+					if (call AMResend.send(destinationAddr, &retranspkt, sizeof(MultiHopsMsg)) == SUCCESS) {
 						retransbusy = TRUE;
 					}
 				}
 			}
-		} else if(call AMPacket.source(msg) == 0 && len == sizeof(ChangeFeqMsg)) {
-			ChangeFeqMsg* cfpkt = (ChangeFeqMsg*)payload;
+		} else if(call AMPacket.source(msg) == 0 && len == sizeof(MultiHopsMsg)) {
+			MultiHopsMsg* cfpkt = (MultiHopsMsg*)payload;
 			if (cfpkt->token == 0xabcdeffe) {
-				printf("New Frenquency: %lu\n", cfpkt->newfeq);
+				printf("New Frenquency: %lu\n", cfpkt->interval);
 				call Timer0.stop();
-				call Timer0.startPeriodic(cfpkt->newfeq);
+				call Timer0.startPeriodic(cfpkt->interval);
+				version++;
 			}
 		}
 		return msg;

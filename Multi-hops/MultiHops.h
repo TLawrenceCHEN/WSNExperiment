@@ -20,12 +20,8 @@ typedef nx_struct MultiHopsMsg {
 	nx_uint16_t humidity;
 	nx_uint16_t light;
 	nx_uint32_t curtime;
+	nx_uint16_t interval;
+	nx_uint16_t version;
 } MultiHopsMsg;
-
-typedef nx_struct ChangeFeqMsg {
-	nx_uint32_t token;
-	nx_uint16_t nodeid;
-	nx_uint32_t newfeq;	
-} ChangeFeqMsg;
 
 #endif
