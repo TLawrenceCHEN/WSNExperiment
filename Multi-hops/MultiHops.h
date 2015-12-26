@@ -9,7 +9,7 @@ static const float SHT11_Temp2 = +0.00008;
 
 enum {
 	AM_MULTIHOPSTORADIO = 6,
-	TIMER_PERIOD_MILLI = 250
+	TIMER_PERIOD_MILLI = 10
 };
 
 typedef nx_struct MultiHopsMsg {
