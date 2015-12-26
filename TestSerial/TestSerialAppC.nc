@@ -8,7 +8,6 @@ implementation {
   components new AMReceiverC(AM_MULTIHOPSTORADIO);
   components new AMSenderC(AM_MULTIHOPSTORADIO);
   components new TimerMilliC();
-  components SerialPrintfC;
 
   App.Boot -> MainC;
   App.N_Control -> AM;

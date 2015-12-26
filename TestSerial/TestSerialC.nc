@@ -59,7 +59,6 @@ implementation {
 	      return bufPtr;
       }
     }
-    return bufPtr;
   }
 
   // receive command from serial

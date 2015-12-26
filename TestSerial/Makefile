@@ -1,4 +1,3 @@
 COMPONENT=TestSerialAppC
-
 include $(MAKERULES)
 
