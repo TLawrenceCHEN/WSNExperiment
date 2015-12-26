@@ -50,6 +50,7 @@ public class Oscilloscope implements MessageListener
     int [] lostnumber = new int[256];
     float [] lossratio = new float[256];
 
+
     /* The current sampling period. If we receive a message from a mote
        with a newer version, we update our interval. If we receive a message
        with an older version, we broadcast a message with the current interval

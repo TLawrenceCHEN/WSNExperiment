@@ -1,30 +1,42 @@
-README for TestSerial
+README for Oscilloscope
 Author/Contact: tinyos-help@millennium.berkeley.edu
 
 Description:
 
-TestSerial is a simple application that may be used to test that the
-TinyOS java toolchain can communicate with a mote over the serial
-port. The java application sends packets to the serial port at 1Hz:
-the packet contains an incrementing counter. When the mote application
-receives a counter packet, it displays the bottom three bits on its
-LEDs. (This application is similar to RadioCountToLeds, except that it
-operates over the serial port.) Likewise, the mote also sends packets
-to the serial port at 1Hz. Upon reception of a packet, the java
-application prints the counter's value to standard out.
+Oscilloscope is a simple data-collection demo. It periodically samples
+the default sensor and broadcasts a message over the radio every 10
+readings. These readings can be received by a BaseStation mote and
+displayed by the Java "Oscilloscope" application found in the java
+subdirectory. The sampling rate starts at 4Hz, but can be changed from
+the Java application.
 
-Java Application Usage:
-  java TestSerial [-comm <packetsource>]
+You can compile Oscilloscope with a sensor board's default sensor by compiling
+as follows:
+  SENSORBOARD=<sensorboard name> make <mote>
 
-  If not specified, the <packetsource> defaults to sf@localhost:9002 or
-  to your MOTECOM environment variable (if defined).
-
-Python Usage:
-  tos-dump /dev/ttyUSB0 57600
+You can change the sensor used by editing OscilloscopeAppC.nc.
 
 Tools:
+
+To display the readings from Oscilloscope motes, install the BaseStation
+application on a mote connected to your PC's serial port. Then run the 
+Oscilloscope display application found in the java subdirectory, as
+follows:
+  cd java
+  make
+  java net.tinyos.sf.SerialForwarder -comm serial@<serial port>:<mote>
+  # e.g., java net.tinyos.sf.SerialForwarder -comm serial@/dev/ttyUSB0:mica2
+  # or java net.tinyos.sf.SerialForwarder -comm serial@COM2:telosb
+  ./run
+
+The controls at the bottom of the screen allow you to zoom in or out the X
+axis, change the range of the Y axis, and clear all received data. You can
+change the color used to display a mote by clicking on its color in the
+mote table.
 
 Known bugs/limitations:
 
 None.
 
+
+$Id: README.txt,v 1.6 2008/07/25 03:01:45 regehr Exp $
