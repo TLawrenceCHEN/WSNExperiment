@@ -1,0 +1,4 @@
+COMPONENT=TestSerialAppC
+
+include $(MAKERULES)
+
