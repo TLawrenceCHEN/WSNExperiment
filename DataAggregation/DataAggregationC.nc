@@ -117,6 +117,7 @@ module DataAggregationC {
 			Query* querypkt = (Query*)payload;
 			uint16_t seq_num = querypkt->sequence_number;
 			call Leds.led1Toggle();
+			printf("sequence_num: %u\nindex: %d\ndata[seq]: %lu\n", seq_num, seq_num / 2 - (seq_num + 1) % 2, data[seq_num / 2 - (seq_num + 1) % 2]);
 			if (data[seq_num / 2 - (seq_num + 1) % 2] != 0xffffffff) {
 				Data* lostpkt = (Data*)(call Packet.getPayload(&dpkt, sizeof(Data)));
 				call Leds.led2Toggle();
