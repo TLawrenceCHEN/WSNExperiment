@@ -47,7 +47,7 @@ module DAmasterC {
 				continue;
 			}
 			for (j = i-1; j>=0; j--){
-				if (temp > random_integer[j]){
+				if (temp >= random_integer[j]){
 					for (k = i; k > j+1; k--){
 						random_integer[k] = random_integer[k-1]; 
 					}
@@ -103,7 +103,7 @@ module DAmasterC {
 		if (err != SUCCESS) {
 			call SplitControl.start();
 		} else {
-			call Timer.startPeriodic(1000);
+			call Timer.startPeriodic(10);
 		}
 	}
 
@@ -115,6 +115,7 @@ module DAmasterC {
 		if(qt != qh)
 			post sendQuery();
 		if(state == 1) {
+			call Leds.led2On();
 			call Timer.stop();
 			call Timer.startPeriodic(5000);
 		}
