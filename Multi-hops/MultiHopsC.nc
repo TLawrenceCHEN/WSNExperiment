@@ -135,7 +135,15 @@ module MultiHopsC {
 				call Timer0.startPeriodic(cfpkt->interval);
 				version++;
 			}
-		}
+		}/*
+		if (call AMPacket.destination(msg) == 0 && len == sizeof(Value)) {
+			Value* valpkt = (Value*)payload;
+			ACK* ackpkt = call Packet.getPayload(&pkt, sizeof(ACK));
+			call Leds.led2Toggle();
+			ackpkt->group_id = valpkt->group_id;
+			printf("group_id: %u\nmax: %lu\nmin: %lu\nsum: %lu\naverage: %lu\nmedian: %lu\n", valpkt->group_id, valpkt->max, valpkt->min, valpkt->sum, valpkt->average, valpkt->median);
+			call AMSend.send((valpkt->group_id - 1)*3+1, &pkt, sizeof(ACK));
+		}*/
 		return msg;
 	}
 	

@@ -9,7 +9,7 @@ static const float SHT11_Temp2 = +0.00008;
 
 enum {
 	AM_MULTIHOPSTORADIO = 6,
-	TIMER_PERIOD_MILLI = 10
+	TIMER_PERIOD_MILLI = 100
 };
 
 typedef nx_struct MultiHopsMsg {
@@ -23,5 +23,18 @@ typedef nx_struct MultiHopsMsg {
 	nx_uint16_t interval;
 	nx_uint16_t version;
 } MultiHopsMsg;
+/*
+typedef nx_struct Value {
+	nx_uint8_t group_id;
+	nx_uint32_t max;
+	nx_uint32_t min;
+	nx_uint32_t sum;
+	nx_uint32_t average;
+	nx_uint32_t median;
+} Value;
+
+typedef nx_struct ACK {
+	nx_uint8_t group_id;
+} ACK;*/
 
 #endif

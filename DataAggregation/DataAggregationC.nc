@@ -18,11 +18,11 @@ module DataAggregationC {
 	uint32_t sum = 0;
     uint16_t sequence_number;
     uint16_t master_nodeid = (GROUP_ID - 1) * 3 + 1;
-    uint16_t lost_seq[200];
+    //uint16_t lost_seq[200];
 	message_t dpkt_queue[12];
     int qh = 0, qt = 0;
     uint16_t size = 0;
-    uint32_t data[1000];
+    uint32_t data[2000];
     bool listen_mode = FALSE;
 
 	void queue_in(Data* dp) {
@@ -106,26 +106,28 @@ module DataAggregationC {
 			Data* datapkt = (Data*)payload;
 			uint16_t seq_num = datapkt->sequence_number;
 			uint32_t rand_int = datapkt->random_integer;
-			call Leds.led0Toggle();
+			call Leds.led0Toggle();/*
 			if (seq_num % 2 == nodeid % 2) {
 				if (data[seq_num / 2 - (seq_num + 1) % 2] != 0xffffffff)
 					data[seq_num / 2 - (seq_num + 1) % 2] = rand_int;
-			}
+			}*/
+			if (data[seq_num - 1] != 0xffffffff)
+				data[seq_num - 1] = rand_int;
 		}
 
-		if (call AMPacket.source(msg) == master_nodeid && call AMPacket.destination(msg) == nodeid && len == sizeof(Query)) {
+		if (call AMPacket.source(msg) == master_nodeid && len == sizeof(Query)) {
 			Query* querypkt = (Query*)payload;
 			uint16_t seq_num = querypkt->sequence_number;
 			call Leds.led1Toggle();
-			printf("sequence_num: %u\nindex: %d\ndata[seq]: %lu\n", seq_num, seq_num / 2 - (seq_num + 1) % 2, data[seq_num / 2 - (seq_num + 1) % 2]);
-			if (data[seq_num / 2 - (seq_num + 1) % 2] != 0xffffffff) {
+			printf("sequence_num: %u\nindex: %d\ndata[seq]: %lu\n", seq_num, seq_num - 1, data[seq_num - 1]);
+			if (data[seq_num - 1] != 0xffffffff) {
 				Data* lostpkt = (Data*)(call Packet.getPayload(&dpkt, sizeof(Data)));
 				call Leds.led2Toggle();
 				if (lostpkt == NULL) {
 					return;
 				}
 				lostpkt->sequence_number = seq_num;
-				lostpkt->random_integer = data[seq_num / 2 - (seq_num + 1) % 2];
+				lostpkt->random_integer = data[seq_num - 1];
 				queue_in(&dpkt);
 				post senddp();
 				return msg;

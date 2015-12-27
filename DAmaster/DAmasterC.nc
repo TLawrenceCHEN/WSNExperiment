@@ -21,6 +21,7 @@ module DAmasterC {
     uint16_t count = 0; //pkg number received now
 	uint32_t random_integer[2000] = {0};
 	bool lostPkt = FALSE;
+	uint32_t time;
 
 	message_t query[12];
 	int qh = 0, qt = 0;
@@ -61,8 +62,9 @@ module DAmasterC {
 		result.median = (random_integer[1000]+random_integer[999])/2;
 		result.sum = sum;
 		result.average = sum/2000;
-
-		printf("max: %lu\nmin: %lu\nmedian: %lu\nsum: %lu\naverage: %lu\n", result.max, result.min, result.median, result.sum, result.average);
+		time = call Timer.getNow();
+		
+		printf("max: %lu\nmin: %lu\nmedian: %lu\nsum: %lu\naverage: %lu\ntime: %lu\n", result.max, result.min, result.median, result.sum, result.average, time);
 		
 		memcpy(call Packet.getPayload(&pkt, sizeof(Value)), &result, sizeof(Value));
 		call AMSend.send(0, &pkt, sizeof(Value)); // send result
@@ -71,7 +73,7 @@ module DAmasterC {
 	task void sendQuery()
 	{
 		Query* dp = (Query*)call Packet.getPayload(&query[qt], sizeof(Query));
-		if(SUCCESS != call AMSend.send(18 - (dp->sequence_number)%2, &query[qt], sizeof(Query)))
+		if(SUCCESS != call AMSend.send(AM_BROADCAST_ADDR, &query[qt], sizeof(Query)))
 			post sendQuery();
 		else {
 			call Leds.led1Toggle();
@@ -100,6 +102,8 @@ module DAmasterC {
 	event void SplitControl.startDone(error_t err) {
 		if (err != SUCCESS) {
 			call SplitControl.start();
+		} else {
+			call Timer.startPeriodic(1000);
 		}
 	}
 
@@ -129,7 +133,7 @@ module DAmasterC {
 			uint16_t seq_num = datapkt->sequence_number;
 			uint32_t rand_int = datapkt->random_integer;
 			call Leds.led0Toggle();
-			if (random_integer[seq_num-1] != 0xffffffff){return msg;} //already get this number
+			if (random_integer[seq_num-1] != 0xffffffff){pre_seq_number = seq_num;return msg;} //already get this number
 			
 			random_integer[seq_num-1] = rand_int;
 			count++;
@@ -173,6 +177,7 @@ module DAmasterC {
         }else if (call AMPacket.source(msg) == 0 && len == sizeof(ACK)){ // ACK from node 0
 			ACK* ack = (ACK*)(call Packet.getPayload(&pkt, sizeof(ACK)));
 			uint8_t group_id = ack->group_id;
+			call Leds.led2Toggle();
 			if (group_id == GROUP_ID)
         		state = 2;
         }
